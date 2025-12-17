@@ -1,0 +1,14 @@
+{
+  "name": "wealth-upgrade-game",
+  "version": "1.0.0",
+  "description": "부 강화하기 게임",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["game", "clicker", "wealth"],
+  "author": "",
+  "license": "MIT"
+}
+

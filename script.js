@@ -71,6 +71,48 @@ function initParticleCanvas() {
     particleCanvas.height = rect.height;
 }
 
+// 폭죽 생성 함수
+function createFirework(x, y) {
+    const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#FFFFFF', '#FFA500', '#FF69B4', '#00FFA3'];
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 100 + Math.random() * 100;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        
+        firework.style.left = x + 'px';
+        firework.style.top = y + 'px';
+        firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        firework.style.setProperty('--tx', tx + 'px');
+        firework.style.setProperty('--ty', ty + 'px');
+        firework.style.animation = `fireworkExplode ${0.8 + Math.random() * 0.4}s ease-out forwards`;
+        
+        document.body.appendChild(firework);
+        
+        setTimeout(() => {
+            firework.remove();
+        }, 1200);
+    }
+}
+
+// 여러 개의 폭죽 발사
+function launchFireworks() {
+    const count = 5;
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * (window.innerHeight * 0.6);
+            createFirework(x, y);
+            playFireworkSound();
+        }, i * 300);
+    }
+}
+
 // DOM 요소
 const levelText = document.getElementById('levelText');
 const upgradeButton = document.getElementById('upgradeButton');
@@ -82,6 +124,7 @@ const particleCanvas = document.getElementById('particleCanvas');
 const particleCtx = particleCanvas.getContext('2d');
 const levelUpEffect = document.getElementById('levelUpEffect');
 const clickEffect = document.getElementById('clickEffect');
+const milestoneEffect = document.getElementById('milestoneEffect');
 const timeButtons = document.querySelectorAll('.time-btn');
 const startButton = document.getElementById('startButton');
 const resetButton = document.getElementById('resetButton');
@@ -94,6 +137,195 @@ const timeSettings = document.querySelector('.time-settings');
 
 // 파티클 시스템
 const particles = [];
+
+// 오디오 컨텍스트 생성
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+// 레벨업 효과음 생성 함수
+function playLevelUpSound() {
+    const now = audioContext.currentTime;
+    
+    // 메인 톤
+    const oscillator1 = audioContext.createOscillator();
+    const gainNode1 = audioContext.createGain();
+    
+    oscillator1.connect(gainNode1);
+    gainNode1.connect(audioContext.destination);
+    
+    // 상승하는 음계 (C -> E -> G -> C)
+    oscillator1.frequency.setValueAtTime(523.25, now); // C5
+    oscillator1.frequency.setValueAtTime(659.25, now + 0.1); // E5
+    oscillator1.frequency.setValueAtTime(783.99, now + 0.2); // G5
+    oscillator1.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+    
+    oscillator1.type = 'sine';
+    
+    gainNode1.gain.setValueAtTime(0.3, now);
+    gainNode1.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    
+    oscillator1.start(now);
+    oscillator1.stop(now + 0.5);
+    
+    // 하모닉 톤 (더 풍부한 사운드)
+    const oscillator2 = audioContext.createOscillator();
+    const gainNode2 = audioContext.createGain();
+    
+    oscillator2.connect(gainNode2);
+    gainNode2.connect(audioContext.destination);
+    
+    oscillator2.frequency.setValueAtTime(1046.50, now); // C6
+    oscillator2.frequency.setValueAtTime(1318.51, now + 0.1); // E6
+    oscillator2.frequency.setValueAtTime(1567.98, now + 0.2); // G6
+    oscillator2.frequency.setValueAtTime(2093.00, now + 0.3); // C7
+    
+    oscillator2.type = 'triangle';
+    
+    gainNode2.gain.setValueAtTime(0.15, now);
+    gainNode2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    
+    oscillator2.start(now);
+    oscillator2.stop(now + 0.5);
+}
+
+// 클릭 효과음 생성 함수
+function playClickSound() {
+    const now = audioContext.currentTime;
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(800, now);
+    oscillator.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+    
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.2, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+    
+    oscillator.start(now);
+    oscillator.stop(now + 0.1);
+}
+
+// 게임 종료 효과음 생성 함수
+function playGameOverSound() {
+    const now = audioContext.currentTime;
+    
+    // 첫 번째 음 (하강)
+    const osc1 = audioContext.createOscillator();
+    const gain1 = audioContext.createGain();
+    osc1.connect(gain1);
+    gain1.connect(audioContext.destination);
+    
+    osc1.frequency.setValueAtTime(800, now);
+    osc1.frequency.exponentialRampToValueAtTime(400, now + 0.3);
+    osc1.frequency.exponentialRampToValueAtTime(200, now + 0.6);
+    
+    osc1.type = 'sine';
+    gain1.gain.setValueAtTime(0.3, now);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+    
+    osc1.start(now);
+    osc1.stop(now + 0.6);
+    
+    // 두 번째 음 (낮은 베이스)
+    const osc2 = audioContext.createOscillator();
+    const gain2 = audioContext.createGain();
+    osc2.connect(gain2);
+    gain2.connect(audioContext.destination);
+    
+    osc2.frequency.setValueAtTime(150, now + 0.2);
+    osc2.type = 'triangle';
+    gain2.gain.setValueAtTime(0.2, now + 0.2);
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+    
+    osc2.start(now + 0.2);
+    osc2.stop(now + 0.8);
+}
+
+// 폭죽 효과음 생성 함수
+function playFireworkSound() {
+    const now = audioContext.currentTime;
+    
+    // 폭발음
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(1000, now);
+    oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+    
+    oscillator.type = 'sawtooth';
+    
+    gainNode.gain.setValueAtTime(0.3, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+    
+    oscillator.start(now);
+    oscillator.stop(now + 0.3);
+    
+    // 반짝임 소리
+    const osc2 = audioContext.createOscillator();
+    const gain2 = audioContext.createGain();
+    
+    osc2.connect(gain2);
+    gain2.connect(audioContext.destination);
+    
+    osc2.frequency.setValueAtTime(2000, now + 0.1);
+    osc2.frequency.exponentialRampToValueAtTime(3000, now + 0.4);
+    
+    osc2.type = 'sine';
+    
+    gain2.gain.setValueAtTime(0.15, now + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    
+    osc2.start(now + 0.1);
+    osc2.stop(now + 0.4);
+}
+
+// 10레벨 달성 효과음
+function playMilestoneSound() {
+    const now = audioContext.currentTime;
+    
+    // 트럼펫 같은 팡파르 효과
+    const frequencies = [523.25, 659.25, 783.99, 1046.50]; // C, E, G, C (한 옥타브 위)
+    
+    frequencies.forEach((freq, index) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.frequency.setValueAtTime(freq, now + index * 0.15);
+        osc.type = 'square';
+        
+        gain.gain.setValueAtTime(0.3, now + index * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + index * 0.15 + 0.4);
+        
+        osc.start(now + index * 0.15);
+        osc.stop(now + index * 0.15 + 0.4);
+    });
+    
+    // 심벌 효과
+    const cymbal = audioContext.createOscillator();
+    const cymbalGain = audioContext.createGain();
+    
+    cymbal.connect(cymbalGain);
+    cymbalGain.connect(audioContext.destination);
+    
+    cymbal.frequency.setValueAtTime(3000, now + 0.6);
+    cymbal.type = 'sawtooth';
+    
+    cymbalGain.gain.setValueAtTime(0.2, now + 0.6);
+    cymbalGain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+    
+    cymbal.start(now + 0.6);
+    cymbal.stop(now + 1.2);
+}
 
 // 이미지 로드 (50개의 개별 이미지)
 const characterImages = [];
@@ -185,9 +417,45 @@ function drawCharacter(level) {
     ctx.drawImage(img, 0, 0, displaySize, displaySize);
 }
 
+// 레벨에 따른 테두리 색상 가져오기
+function getBorderColorByLevel(level) {
+    if (level >= 1 && level <= 9) {
+        return 'rgba(255, 255, 255, 0.3)'; // 기본 흰색
+    } else if (level >= 10 && level <= 19) {
+        return '#FF4500'; // 진한 오렌지 레드
+    } else if (level >= 20 && level <= 29) {
+        return '#FF8C00'; // 다크 오렌지
+    } else if (level >= 30 && level <= 39) {
+        return '#FFD700'; // 골드
+    } else if (level >= 40 && level <= 49) {
+        return '#00FF00'; // 라임 그린
+    } else if (level === 50) {
+        return '#00FFFF'; // 시안 (최고 레벨)
+    }
+    return 'rgba(255, 255, 255, 0.3)';
+}
+
 // 레벨 업데이트
 function updateLevel() {
     levelText.textContent = `LEVEL ${currentLevel}`;
+    
+    // 레벨에 따라 게임 영역 테두리 색상 변경
+    const borderColor = getBorderColorByLevel(currentLevel);
+    gameArea.style.borderColor = borderColor;
+    
+    // 레벨 10 이상일 때 빛나는 효과 추가
+    if (currentLevel >= 10) {
+        gameArea.classList.add('glowing');
+        gameArea.style.boxShadow = `
+            0 0 20px ${borderColor}80,
+            0 0 40px ${borderColor}60,
+            0 0 60px ${borderColor}40,
+            0 10px 40px rgba(0, 0, 0, 0.5)
+        `;
+    } else {
+        gameArea.classList.remove('glowing');
+        gameArea.style.boxShadow = `0 10px 40px rgba(0, 0, 0, 0.5)`;
+    }
     
     // 레벨 업 애니메이션
     levelText.parentElement.classList.add('level-up-animation');
@@ -238,6 +506,11 @@ function startGame() {
     currentLevel = 1;
     clickCount = 0;
     
+    // 오디오 컨텍스트 활성화 (사용자 상호작용 필요)
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+    
     // UI 전환
     timeSettings.style.display = 'none';
     gameArea.style.display = 'block';
@@ -275,7 +548,7 @@ function updateTimer() {
         timerText.style.color = '#ff4757';
     } else {
         timerText.parentElement.classList.remove('warning');
-        timerText.style.color = '#667eea';
+        timerText.style.color = '#FFFFFF';
     }
 }
 
@@ -283,6 +556,14 @@ function updateTimer() {
 function endGame() {
     gameStarted = false;
     clearInterval(timerInterval);
+    
+    // 게임 종료 효과음 재생
+    playGameOverSound();
+    
+    // 폭죽 효과 발사
+    setTimeout(() => {
+        launchFireworks();
+    }, 300);
     
     // UI 전환
     gameArea.style.display = 'none';
@@ -294,6 +575,10 @@ function endGame() {
     // 최대 레벨 달성 시 특별 메시지
     if (currentLevel === maxLevel) {
         finalLevel.textContent += ' 🎊 최고 레벨 달성! 🎊';
+        // 최대 레벨 달성 시 추가 폭죽
+        setTimeout(() => {
+            launchFireworks();
+        }, 1500);
     }
 }
 
@@ -335,8 +620,47 @@ function showClickEffect(x, y) {
     }, 800);
 }
 
+// 10레벨 달성 이펙트 표시
+function showMilestoneEffect(level) {
+    const milestoneText = milestoneEffect.querySelector('.milestone-text');
+    
+    // 레벨을 10, 20, 30, 40, 50으로 고정
+    let displayLevel = level;
+    if (level % 10 !== 0) {
+        displayLevel = Math.floor(level / 10) * 10;
+    }
+    
+    milestoneText.textContent = `LEVEL ${displayLevel} 달성!`;
+    
+    milestoneEffect.classList.remove('active');
+    void milestoneEffect.offsetWidth; // 리플로우 강제
+    milestoneEffect.classList.add('active');
+    
+    // 효과음 재생
+    playMilestoneSound();
+    
+    // 폭죽 효과
+    setTimeout(() => {
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * (window.innerHeight * 0.5);
+                createFirework(x, y);
+                playFireworkSound();
+            }, i * 200);
+        }
+    }, 500);
+    
+    setTimeout(() => {
+        milestoneEffect.classList.remove('active');
+    }, 2000);
+}
+
 // 레벨업 효과 표시
 function showLevelUpEffect() {
+    // 레벨업 효과음 재생
+    playLevelUpSound();
+    
     levelUpEffect.classList.remove('active');
     void levelUpEffect.offsetWidth; // 리플로우 강제
     levelUpEffect.classList.add('active');
@@ -350,10 +674,10 @@ function showLevelUpEffect() {
     const centerY = particleCanvas.height / 2;
     
     // 여러 색상의 파티클을 여러 번 생성
-    createParticles(centerX, centerY, 50, '#FFD700'); // 금색
-    createParticles(centerX, centerY, 30, '#FF6B6B'); // 빨강
-    createParticles(centerX, centerY, 30, '#4ECDC4'); // 청록
-    createParticles(centerX, centerY, 30, '#95E1D3'); // 민트
+    createParticles(centerX, centerY, 50, '#FFFFFF'); // 흰색
+    createParticles(centerX, centerY, 30, '#FFD700'); // 금색
+    createParticles(centerX, centerY, 30, '#FFA500'); // 주황
+    createParticles(centerX, centerY, 30, '#FF69B4'); // 핑크
     
     animateParticles();
     
@@ -365,9 +689,9 @@ function showLevelUpEffect() {
     }, 300);
     
     // 레벨 텍스트 빛나는 효과
-    levelText.style.textShadow = '0 0 20px #FFD700, 0 0 40px #FFA500, 0 0 60px #FF8C00';
+    levelText.style.textShadow = '0 0 20px #FFFFFF, 0 0 40px #FFFFFF, 0 0 60px #FFFFFF';
     setTimeout(() => {
-        levelText.style.textShadow = '0 0 10px rgba(102, 126, 234, 0.5)';
+        levelText.style.textShadow = '0 2px 10px rgba(0, 0, 0, 0.5)';
     }, 800);
 }
 
@@ -379,6 +703,9 @@ upgradeButton.addEventListener('click', function(e) {
         // 최대 레벨 도달
         return;
     }
+    
+    // 클릭 효과음 재생
+    playClickSound();
     
     // 버튼 애니메이션
     this.classList.add('clicked');
@@ -393,7 +720,7 @@ upgradeButton.addEventListener('click', function(e) {
     // 작은 파티클 생성
     const centerX = particleCanvas.width / 2;
     const centerY = particleCanvas.height / 2;
-    createParticles(centerX, centerY, 5, '#4facfe');
+    createParticles(centerX, centerY, 5, '#FFFFFF');
     if (particles.length === 5) {
         animateParticles();
     }
@@ -422,8 +749,21 @@ upgradeButton.addEventListener('click', function(e) {
         drawCharacter(currentLevel);
         updateProgress();
         
-        // 최대 레벨 달성 시
-        if (currentLevel === maxLevel) {
+        // 10의 배수 레벨 달성 시 특별 이펙트 (10, 20, 30, 40, 50) - 즉시 표시
+        if (currentLevel % 10 === 0) {
+            // 즉시 효과 표시
+            showMilestoneEffect(currentLevel);
+            
+            // 최대 레벨(50) 달성 시 게임 종료
+            if (currentLevel === maxLevel) {
+                setTimeout(() => {
+                    endGame();
+                }, 3000);
+            }
+        }
+        
+        // 최대 레벨이 아닌데 도달한 경우 (혹시 모를 경우)
+        if (currentLevel === maxLevel && currentLevel % 10 !== 0) {
             setTimeout(() => {
                 endGame();
             }, 1000);

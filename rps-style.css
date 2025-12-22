@@ -1,0 +1,933 @@
+@font-face {
+    font-family: 'NanumHuman';
+    src: url('NanumHuman/NanumHumanRegular.woff') format('woff'),
+         url('NanumHuman/NanumHumanRegular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'NanumHuman';
+    src: url('NanumHuman/NanumHumanBold.woff') format('woff'),
+         url('NanumHuman/NanumHumanBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'NanumHuman', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 20px 55px 20px;
+    overflow: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* 인트로 화면 */
+.intro-screen {
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.intro-screen.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.intro-content {
+    background: white;
+    border-radius: 20px;
+    padding: clamp(25px, 4vw, 35px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(15px, 3vw, 20px);
+    min-height: 400px;
+    max-height: 500px;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+}
+
+/* 말풍선 */
+.speech-bubble {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    border-radius: 15px;
+    font-family: 'NanumHuman', sans-serif;
+    font-weight: bold;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: bubbleFloat 3s ease-in-out infinite;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.left-bubble {
+    left: clamp(-80px, -15vw, -40px);
+    top: clamp(90px, 22vh, 140px);
+    transform: rotate(-8deg);
+    animation-delay: 0s;
+    padding: clamp(14px, 2.8vw, 20px) clamp(18px, 3.5vw, 26px);
+    font-size: clamp(1em, 2.2vw, 1.25em);
+}
+
+.right-bubble {
+    right: clamp(-90px, -16vw, -45px);
+    bottom: clamp(40px, 10vh, 80px);
+    top: auto;
+    transform: rotate(8deg);
+    animation-delay: 0.5s;
+    padding: clamp(10px, 2vw, 14px) clamp(14px, 2.5vw, 20px);
+    font-size: clamp(0.85em, 1.8vw, 1em);
+}
+
+@keyframes bubbleFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(-8deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(-8deg);
+    }
+}
+
+.right-bubble {
+    animation-name: bubbleFloatRight;
+}
+
+@keyframes bubbleFloatRight {
+    0%, 100% {
+        transform: translateY(0) rotate(8deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(8deg);
+    }
+}
+
+.intro-character {
+    width: clamp(150px, 40vw, 250px);
+    height: auto;
+    animation: characterFloat 2s ease-in-out infinite;
+    position: relative;
+    z-index: 5;
+}
+
+
+.intro-message {
+    font-size: clamp(1.1em, 3vw, 1.4em);
+    color: #333;
+    line-height: 1.5;
+    font-weight: bold;
+}
+
+.accept-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: clamp(12px, 2.5vw, 16px) clamp(30px, 6vw, 45px);
+    color: white;
+    font-size: clamp(1.3em, 3.5vw, 1.6em);
+    font-family: 'NanumHuman', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    font-weight: bold;
+}
+
+.accept-button:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+.accept-button:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* 게임 화면 */
+.game-screen {
+    animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.title {
+    text-align: center;
+    color: white;
+    font-size: clamp(1.5em, 4vw, 2.2em);
+    margin-bottom: 25px;
+    margin-top: -15px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    line-height: 1.3;
+}
+
+.title .highlight {
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+
+.game-area {
+    background: white;
+    border-radius: 20px;
+    padding: clamp(25px, 5vw, 40px);
+    padding-bottom: clamp(20px, 4vw, 30px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    min-height: 650px;
+    max-height: 650px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: clamp(8px, 2vw, 12px);
+    position: relative;
+    overflow: visible;
+}
+
+.character-container {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.bu-character {
+    width: clamp(150px, 40vw, 280px);
+    height: auto;
+    display: block;
+    margin: 0 auto 5px;
+    animation: characterFloat 2s ease-in-out infinite;
+}
+
+@keyframes characterFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.bu-character.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-10px) rotate(-5deg); }
+    75% { transform: translateX(10px) rotate(5deg); }
+}
+
+.bu-character.show-choice {
+    animation: showChoice 0.5s ease-out;
+}
+
+@keyframes showChoice {
+    0% { 
+        transform: scale(0.8) rotate(-10deg); 
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.15) rotate(5deg); 
+    }
+    100% { 
+        transform: scale(1) rotate(0deg); 
+        opacity: 1;
+    }
+}
+
+.choice-display {
+    margin-top: 0;
+}
+
+.choice-text {
+    font-size: clamp(2.5em, 8vw, 3.5em);
+    font-weight: bold;
+    color: #667eea;
+    margin-top: 0;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.result-display {
+    text-align: center;
+    margin-bottom: 5px;
+    min-height: clamp(45px, 8vw, 60px);
+}
+
+#resultText {
+    font-size: clamp(1.2em, 3.5vw, 1.6em);
+    color: #333;
+    animation: textFadeIn 0.5s ease-in;
+    font-weight: bold;
+}
+
+#resultText.countdown {
+    font-size: clamp(2.5em, 7vw, 3.5em);
+    color: #667eea;
+    animation: countdownPulse 0.5s ease-out;
+}
+
+@keyframes countdownPulse {
+    0% { 
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% { 
+        transform: scale(1.2);
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes textFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3px;
+    margin-top: -5px;
+}
+
+.start-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: clamp(12px, 2.5vw, 18px) clamp(35px, 7vw, 50px);
+    color: white;
+    font-size: clamp(1.3em, 3.5vw, 1.7em);
+    font-family: 'NanumHuman', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.start-button.fade-in {
+    animation: buttonFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes buttonFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.start-button:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+.start-button:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.start-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.home-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3px;
+}
+
+.home-button-container.fade-in {
+    animation: buttonFadeIn 0.5s ease-out 0.2s forwards;
+    opacity: 0;
+}
+
+.home-button {
+    background: #6c757d;
+    border: none;
+    border-radius: 10px;
+    padding: clamp(10px, 2vw, 14px) clamp(25px, 5vw, 35px);
+    color: white;
+    font-size: clamp(1em, 2.5vw, 1.2em);
+    font-family: 'NanumHuman', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(108, 117, 125, 0.3);
+}
+
+.home-button:hover {
+    background: #5a6268;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.5);
+}
+
+.home-button:active {
+    transform: translateY(-1px);
+}
+
+/* 파티클 이펙트 */
+.particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.particle {
+    position: absolute;
+    font-size: clamp(1.5em, 3vw, 2.5em);
+    animation: particleFloat 1.5s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-150px) scale(1.5) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.sparkle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, #fff, #667eea);
+    border-radius: 50%;
+    animation: sparkleFloat 1s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes sparkleFloat {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* 장식 이미지 */
+.deco-img {
+    position: absolute;
+    height: auto;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+.deco-top-left {
+    width: clamp(50px, 10vw, 85px);
+    top: -50px;
+    left: -50px;
+    animation: decoFloat1 3s ease-in-out infinite;
+}
+
+.deco-top-right {
+    width: clamp(35px, 7vw, 60px);
+    top: 20px;
+    right: -60px;
+    animation: decoFloat2 3.5s ease-in-out infinite;
+}
+
+.deco-bottom {
+    width: clamp(45px, 9vw, 75px);
+    bottom: 40px;
+    left: -55px;
+    animation: decoFloat3 4s ease-in-out infinite;
+}
+
+@keyframes decoFloat1 {
+    0%, 100% { 
+        transform: translateY(0) rotate(-10deg) scale(1); 
+    }
+    50% { 
+        transform: translateY(-8px) rotate(5deg) scale(1.05); 
+    }
+}
+
+@keyframes decoFloat2 {
+    0%, 100% { 
+        transform: translateY(0) rotate(15deg) scale(1); 
+    }
+    50% { 
+        transform: translateY(-10px) rotate(-10deg) scale(1.08); 
+    }
+}
+
+@keyframes decoFloat3 {
+    0%, 100% { 
+        transform: translateY(0) rotate(-8deg) scale(1); 
+    }
+    50% { 
+        transform: translateY(-12px) rotate(8deg) scale(1.06); 
+    }
+}
+
+/* 응원 문구 화면 */
+.cheer-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: cheerFadeIn 0.3s ease-in;
+}
+
+.cheer-screen.fade-out {
+    animation: cheerFadeOut 0.5s ease-out forwards;
+}
+
+@keyframes cheerFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes cheerFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.cheer-content {
+    text-align: center;
+    position: relative;
+    background: rgba(0, 0, 0, 0.7);
+    padding: clamp(30px, 6vw, 60px) clamp(40px, 8vw, 80px);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.cheer-text {
+    font-size: clamp(2em, 6vw, 3.5em);
+    color: white;
+    font-weight: bold;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    animation: cheerBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    z-index: 2;
+    line-height: 1.4;
+}
+
+@keyframes cheerBounce {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.3) rotate(10deg);
+        opacity: 1;
+    }
+    80% {
+        transform: scale(0.9) rotate(-5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* 떨어지는 캐릭터 이미지 */
+.falling-character {
+    position: absolute;
+    height: auto;
+    pointer-events: none;
+    z-index: 1;
+    animation: fall linear forwards;
+    top: -150px;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(calc(100vh + 200px)) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* BGM 토글 버튼 */
+.bgm-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: clamp(50px, 8vw, 60px);
+    height: clamp(50px, 8vw, 60px);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid rgba(102, 126, 234, 0.6);
+    font-size: clamp(1.5em, 4vw, 2em);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 10001;
+    padding: 0;
+}
+
+.bgm-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 1);
+}
+
+.bgm-toggle:active {
+    transform: scale(0.95);
+}
+
+.bgm-toggle.off {
+    background: rgba(200, 200, 200, 0.9);
+    border-color: rgba(150, 150, 150, 0.6);
+}
+
+/* 라운드 종료 화면 */
+.end-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: endFadeIn 0.3s ease-in;
+}
+
+.end-screen.fade-out {
+    animation: endFadeOut 0.4s ease-out forwards;
+}
+
+@keyframes endFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes endFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.end-content {
+    text-align: center;
+    position: relative;
+}
+
+.end-text {
+    font-size: clamp(3em, 12vw, 7em);
+    color: white;
+    font-weight: bold;
+    font-family: 'NanumHuman', sans-serif;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+    animation: endBounceShake 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes endBounceShake {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    40% {
+        transform: scale(1.4) rotate(10deg);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(0.85) rotate(-8deg);
+    }
+    80% {
+        transform: scale(1.1) rotate(3deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* 폭죽 효과 */
+.end-firework {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes fireworkExplode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+
+/* Copyright */
+.copyright {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 0;
+    background: rgba(76, 46, 122, 0.9);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: clamp(0.65em, 1.5vw, 0.8em);
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'NanumHuman', sans-serif;
+    z-index: 10000;
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
+
+.copyright p {
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px 10px 50px 10px;
+    }
+    
+    .bgm-toggle {
+        top: 15px;
+        right: 15px;
+        width: clamp(45px, 10vw, 55px);
+        height: clamp(45px, 10vw, 55px);
+    }
+    
+    .left-bubble {
+        left: clamp(-70px, -13vw, -35px);
+        top: clamp(80px, 20vh, 120px);
+        padding: clamp(12px, 2.5vw, 16px) clamp(16px, 3vw, 22px);
+        font-size: clamp(0.9em, 2vw, 1.1em);
+    }
+    
+    .right-bubble {
+        right: clamp(-75px, -14vw, -38px);
+        bottom: clamp(35px, 8vh, 65px);
+        padding: clamp(8px, 1.8vw, 12px) clamp(12px, 2.2vw, 16px);
+        font-size: clamp(0.75em, 1.6vw, 0.9em);
+    }
+    
+    .title {
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+    
+    .game-area {
+        padding: 20px 15px;
+        padding-bottom: 20px;
+        min-height: 600px;
+        max-height: 600px;
+        gap: 8px;
+    }
+    
+    .bu-character {
+        margin-bottom: 5px;
+    }
+    
+    .intro-content {
+        padding: 20px;
+        gap: 15px;
+        min-height: 350px;
+        max-height: 400px;
+    }
+    
+    .copyright {
+        bottom: 10px;
+        font-size: 0.8em;
+    }
+    
+    .character-container {
+        margin-bottom: 5px;
+    }
+    
+    .deco-top-left {
+        width: clamp(45px, 9vw, 75px);
+        top: -40px;
+        left: -40px;
+    }
+    
+    .deco-top-right {
+        width: clamp(30px, 6vw, 50px);
+        top: 15px;
+        right: -50px;
+    }
+    
+    .deco-bottom {
+        width: clamp(40px, 8vw, 65px);
+        bottom: 35px;
+        left: -45px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px 10px 45px 10px;
+    }
+    
+    .bgm-toggle {
+        top: 10px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
+    }
+    
+    .left-bubble {
+        left: clamp(-60px, -11vw, -30px);
+        top: clamp(70px, 18vh, 100px);
+        padding: 10px 14px;
+        font-size: 0.85em;
+    }
+    
+    .right-bubble {
+        right: clamp(-65px, -12vw, -32px);
+        bottom: clamp(30px, 7vh, 55px);
+        padding: 7px 10px;
+        font-size: 0.7em;
+    }
+    
+    .title {
+        margin-bottom: 15px;
+        margin-top: -8px;
+        font-size: 1.3em;
+    }
+    
+    .game-area {
+        padding: 18px 12px;
+        padding-bottom: 18px;
+        min-height: 560px;
+        max-height: 560px;
+        gap: 6px;
+    }
+    
+    .result-display {
+        min-height: 40px;
+        margin-bottom: 5px;
+    }
+    
+    .intro-content {
+        padding: 18px;
+        gap: 12px;
+        min-height: 320px;
+        max-height: 350px;
+    }
+    
+    .copyright {
+        bottom: 8px;
+        font-size: 0.75em;
+    }
+    
+    .character-container {
+        margin-bottom: 5px;
+    }
+    
+    .bu-character {
+        margin-bottom: 5px;
+    }
+    
+    .deco-top-left {
+        width: clamp(40px, 8vw, 65px);
+        top: -35px;
+        left: -35px;
+    }
+    
+    .deco-top-right {
+        width: clamp(25px, 5vw, 45px);
+        top: 10px;
+        right: -40px;
+    }
+    
+    .deco-bottom {
+        width: clamp(35px, 7vw, 55px);
+        bottom: 30px;
+        left: -40px;
+    }
+}
+

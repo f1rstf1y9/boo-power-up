@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부와의 달콤살벌 부위바위보</title>
+    <link rel="stylesheet" href="rps-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 인트로 화면 -->
+        <div id="introScreen" class="intro-screen">
+            <h1 class="title">부와의 달콤살벌 <span class="highlight">부위바위보</span></h1>
+            <div class="intro-content">
+                <img src="chzzk_4.png" alt="장식" class="deco-img deco-top-left">
+                <img src="chzzk_6.png" alt="장식" class="deco-img deco-top-right">
+                <img src="chzzk_9.png" alt="장식" class="deco-img deco-bottom">
+                
+                <!-- 말풍선들 -->
+                <div class="speech-bubble left-bubble">어느 것을 낼까요?</div>
+                <div class="speech-bubble right-bubble">알아맞춰봅시다 😜</div>
+                
+                <img src="chzzk_1.png" alt="부" class="intro-character">
+                <p class="intro-message">부위바위보 게임을<br>시작하시겠습니까? ❤️🔥</p>
+                <button id="acceptButton" class="accept-button">수락하기</button>
+            </div>
+        </div>
+        
+        <!-- 게임 화면 -->
+        <div id="gameScreen" class="game-screen" style="display: none;">
+            <h1 class="title">부와의 달콤살벌 <span class="highlight">부위바위보</span></h1>
+            
+            <div class="game-area">
+                <img src="chzzk_4.png" alt="장식" class="deco-img deco-top-left">
+                <img src="chzzk_6.png" alt="장식" class="deco-img deco-top-right">
+                <img src="chzzk_9.png" alt="장식" class="deco-img deco-bottom">
+                
+                <div class="character-container">
+                    <img id="buCharacter" src="chzzk_1.png" alt="부" class="bu-character">
+                    <div class="choice-display">
+                        <p class="choice-text" id="buChoice">?</p>
+                    </div>
+                </div>
+                
+                <div class="result-display" id="resultDisplay">
+                    <h2 id="resultText">시작 버튼을 눌러주세요!</h2>
+                </div>
+                
+            <div class="button-container">
+                <button id="startButton" class="start-button">
+                    <span>시작</span>
+                </button>
+            </div>
+            
+            <div class="home-button-container" id="homeButtonContainer" style="display: none;">
+                <button id="homeButton" class="home-button">처음으로</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <!-- 이펙트 파티클 -->
+    <div id="particleContainer" class="particle-container"></div>
+    
+    <!-- 응원 문구 화면 -->
+    <div id="cheerScreen" class="cheer-screen" style="display: none;">
+        <div class="cheer-content">
+            <p class="cheer-text" id="cheerText">화이팅! 🎉</p>
+        </div>
+    </div>
+    
+    <!-- 라운드 종료 화면 -->
+    <div id="endScreen" class="end-screen" style="display: none;">
+        <div class="end-content">
+            <p class="end-text">라운드 종료 ‼️</p>
+        </div>
+    </div>
+    
+    <!-- BGM 토글 버튼 -->
+    <button id="bgmToggle" class="bgm-toggle" title="BGM 켜기/끄기">
+        🔔
+    </button>
+    
+    <!-- Copyright -->
+    <footer class="copyright">
+        <p>© ji.kwon</p>
+    </footer>
+    
+    <script src="rps-script.js"></script>
+</body>
+</html>
+
